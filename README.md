@@ -6,6 +6,10 @@ Demonstrates how to update buffer data and synchronize access between the CPU an
 
 In this sample you'll learn how to properly update and render animated resources that are shared between the CPU and the graphics processing unit (GPU). In particular, you'll learn how to modify data each frame, avoid data access hazards, and execute CPU and GPU work in parallel.
 
+## Getting Started
+
+The Xcode project contains schemes for running the sample on macOS, iOS, or tvOS. Metal is not supported in the iOS or tvOS Simulator, so the iOS and tvOS schemes require a physical device to run the sample. The default scheme is macOS, which runs the sample as is on your Mac.
+
 ## CPU/GPU Parallelism and Shared Resource Access
 
 The CPU and GPU are separate, asynchronous processors. In a Metal app or game, the CPU encodes commands and the GPU executes commands. This sequence is repeated in every frame, and a full frame's work is completed when both the CPU and the GPU have finished their work. The CPU and the GPU can work in parallel and don't need to wait for each other to finish their work. For example, the GPU can execute commands for frame 1 while the CPU encodes commands for frame 2.

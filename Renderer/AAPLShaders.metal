@@ -30,7 +30,7 @@ typedef struct
 // Vertex Function
 vertex RasterizerData
 vertexShader(uint vertexID [[ vertex_id ]],
-             constant AAPLVertex *vertices [[ buffer(AAPLVertexInputIndexVertices) ]],
+             device AAPLVertex *vertices [[ buffer(AAPLVertexInputIndexVertices) ]],
              constant vector_uint2 *viewportSizePointer  [[ buffer(AAPLVertexInputIndexViewportSize) ]])
 {
     RasterizerData out;
@@ -39,7 +39,7 @@ vertexShader(uint vertexID [[ vertex_id ]],
     out.clipSpacePosition = vector_float4(0.0, 0.0, 0.0, 1.0);
 
     // Index into our array of positions to get the current vertex
-    //   Our positons are specified in pixel dimensions (i.e. a value of 100 is 100 pixels from
+    //   Our positions are specified in pixel dimensions (i.e. a value of 100 is 100 pixels from
     //   the origin)
     float2 pixelSpacePosition = vertices[vertexID].position.xy;
 

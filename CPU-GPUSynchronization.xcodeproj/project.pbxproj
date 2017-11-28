@@ -54,8 +54,8 @@
 		3ABBACED1F73154F0080C72C /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		3ABBACEE1F73154F0080C72C /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS11.0.sdk/System/Library/Frameworks/MetalKit.framework; sourceTree = DEVELOPER_DIR; };
 		3AC448951EC126D7006F9D6B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		712785D5EDCA3463358B56E0 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; path = LICENSE.txt; sourceTree = "<group>"; };
-		7464D1C514E027A3C9CAD5FB /* SampleCode.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
+		7841DB5A8DE0D1B64C87BD04 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; path = LICENSE.txt; sourceTree = "<group>"; };
+		DFA82E908CC4A7CA9C0C2485 /* SampleCode.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,14 +86,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		29B4CB959F6EA3C36D7089A9 /* Configuration */ = {
-			isa = PBXGroup;
-			children = (
-				7464D1C514E027A3C9CAD5FB /* SampleCode.xcconfig */,
-			);
-			name = Configuration;
-			sourceTree = "<group>";
-		};
 		3A1E2E091F71B49100A7B165 /* Application */ = {
 			isa = PBXGroup;
 			children = (
@@ -145,8 +137,8 @@
 				3A1E2E091F71B49100A7B165 /* Application */,
 				3ABBACE61F7314E80080C72C /* Frameworks */,
 				3A7072DC1EBD4A67001F05E4 /* Products */,
-				29B4CB959F6EA3C36D7089A9 /* Configuration */,
-				B6D03C85584F9FA132085F18 /* LICENSE */,
+				7FBCDA466CC8FAD211250E3B /* Configuration */,
+				C4372FC1C44A2134F83C5D68 /* LICENSE */,
 			);
 			sourceTree = "<group>";
 		};
@@ -181,10 +173,18 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		B6D03C85584F9FA132085F18 /* LICENSE */ = {
+		7FBCDA466CC8FAD211250E3B /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
-				712785D5EDCA3463358B56E0 /* LICENSE.txt */,
+				DFA82E908CC4A7CA9C0C2485 /* SampleCode.xcconfig */,
+			);
+			name = Configuration;
+			sourceTree = "<group>";
+		};
+		C4372FC1C44A2134F83C5D68 /* LICENSE */ = {
+			isa = PBXGroup;
+			children = (
+				7841DB5A8DE0D1B64C87BD04 /* LICENSE.txt */,
 			);
 			name = LICENSE;
 			path = LICENSE;
@@ -391,7 +391,7 @@
 /* Begin XCBuildConfiguration section */
 		3A70732C1EBD4A67001F05E4 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7464D1C514E027A3C9CAD5FB /* SampleCode.xcconfig */;
+			baseConfigurationReference = DFA82E908CC4A7CA9C0C2485 /* SampleCode.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -443,7 +443,7 @@
 		};
 		3A70732D1EBD4A67001F05E4 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7464D1C514E027A3C9CAD5FB /* SampleCode.xcconfig */;
+			baseConfigurationReference = DFA82E908CC4A7CA9C0C2485 /* SampleCode.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -488,7 +488,7 @@
 		};
 		3A70732F1EBD4A67001F05E4 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7464D1C514E027A3C9CAD5FB /* SampleCode.xcconfig */;
+			baseConfigurationReference = DFA82E908CC4A7CA9C0C2485 /* SampleCode.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = "";
@@ -499,7 +499,7 @@
 				INFOPLIST_FILE = Application/iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.CPU-GPUParallelismAndSynchronization${SAMPLE_CODE_DISAMBIGUATOR}";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.CPU-GPUSynchronization${SAMPLE_CODE_DISAMBIGUATOR}";
 				PRODUCT_NAME = "CPU-GPUSynchronization";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
@@ -509,7 +509,7 @@
 		};
 		3A7073301EBD4A67001F05E4 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7464D1C514E027A3C9CAD5FB /* SampleCode.xcconfig */;
+			baseConfigurationReference = DFA82E908CC4A7CA9C0C2485 /* SampleCode.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = "";
@@ -517,7 +517,7 @@
 				INFOPLIST_FILE = Application/iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.CPU-GPUParallelismAndSynchronization${SAMPLE_CODE_DISAMBIGUATOR}";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.CPU-GPUSynchronization${SAMPLE_CODE_DISAMBIGUATOR}";
 				PRODUCT_NAME = "CPU-GPUSynchronization";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
@@ -528,7 +528,7 @@
 		};
 		3A7073321EBD4A67001F05E4 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7464D1C514E027A3C9CAD5FB /* SampleCode.xcconfig */;
+			baseConfigurationReference = DFA82E908CC4A7CA9C0C2485 /* SampleCode.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = "";
@@ -538,7 +538,7 @@
 				);
 				INFOPLIST_FILE = Application/tvOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.CPU-GPUParallelismAndSynchronization${SAMPLE_CODE_DISAMBIGUATOR}";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.CPU-GPUSynchronization${SAMPLE_CODE_DISAMBIGUATOR}";
 				PRODUCT_NAME = "CPU-GPUSynchronization";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = appletvos;
@@ -549,14 +549,14 @@
 		};
 		3A7073331EBD4A67001F05E4 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7464D1C514E027A3C9CAD5FB /* SampleCode.xcconfig */;
+			baseConfigurationReference = DFA82E908CC4A7CA9C0C2485 /* SampleCode.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = "";
 				GCC_PREPROCESSOR_DEFINITIONS = TARGET_TVOS;
 				INFOPLIST_FILE = Application/tvOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.CPU-GPUParallelismAndSynchronization${SAMPLE_CODE_DISAMBIGUATOR}";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.CPU-GPUSynchronization${SAMPLE_CODE_DISAMBIGUATOR}";
 				PRODUCT_NAME = "CPU-GPUSynchronization";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = appletvos;
@@ -568,7 +568,7 @@
 		};
 		3A7073351EBD4A67001F05E4 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7464D1C514E027A3C9CAD5FB /* SampleCode.xcconfig */;
+			baseConfigurationReference = DFA82E908CC4A7CA9C0C2485 /* SampleCode.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
@@ -581,7 +581,7 @@
 				INFOPLIST_FILE = Application/macOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.CPU-GPUParallelismAndSynchronization${SAMPLE_CODE_DISAMBIGUATOR}";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.CPU-GPUSynchronization${SAMPLE_CODE_DISAMBIGUATOR}";
 				PRODUCT_NAME = "CPU-GPUSynchronization";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
@@ -590,7 +590,7 @@
 		};
 		3A7073361EBD4A67001F05E4 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7464D1C514E027A3C9CAD5FB /* SampleCode.xcconfig */;
+			baseConfigurationReference = DFA82E908CC4A7CA9C0C2485 /* SampleCode.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
@@ -600,7 +600,7 @@
 				INFOPLIST_FILE = Application/macOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.CPU-GPUParallelismAndSynchronization${SAMPLE_CODE_DISAMBIGUATOR}";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.CPU-GPUSynchronization${SAMPLE_CODE_DISAMBIGUATOR}";
 				PRODUCT_NAME = "CPU-GPUSynchronization";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;

@@ -2,20 +2,22 @@
 See LICENSE folder for this sample’s licensing information.
 
 Abstract:
-Implementation of renderer class which perfoms Metal setup and per frame rendering
+Implementation of renderer class which performs Metal setup and per frame rendering
 */
 
 @import MetalKit;
 
 #import "AAPLRenderer.h"
 
-// Include header shared between C code here, which executes Metal API commands, and .metal files
+// Header shared between C code here, which executes Metal API commands, and .metal files, which
+//   uses these types as inputs to the shaders
 #import "AAPLShaderTypes.h"
 
 // The max number of command buffers in flight
 static const NSUInteger MaxBuffersInFlight = 3;
 
-// A simple class represing our sprite object, which is represented by a colored quad on screen
+
+// A simple class representing our sprite object, which is just a colored quad on screen
 @interface AAPLSprite : NSObject
 
 @property (nonatomic) vector_float2 position;
@@ -30,8 +32,8 @@ static const NSUInteger MaxBuffersInFlight = 3;
 
 @implementation AAPLSprite
 
-// Return the vertices of one quad posistion at the origin.  After updating the sprites postion
-//   each frame we displace the positon with the sprite's postion and copy it to our vertex buffer
+// Return the vertices of one quad posistion at the origin.  After updating the
+//   sprite's position each frame, we copy it to our vertex buffer
 +(const AAPLVertex *)vertices
 {
     const float SpriteSize = 5;
@@ -81,9 +83,7 @@ static const NSUInteger MaxBuffersInFlight = 3;
 
 }
 
-/// Initialize with the MetalKit view from which we'll obtain our Metal device.  We'll also use this
-/// mtkView object to set the pixelformat and other properties of our drawable
-/// Initialize with the MetalKit view from which we'll obtain our metal device
+/// Initialize with the MetalKit view from which we'll obtain our Metal device
 - (nonnull instancetype)initWithMetalKitView:(nonnull MTKView *)mtkView
 {
     self = [super init];
@@ -177,7 +177,7 @@ static const NSUInteger MaxBuffersInFlight = 3;
         {
             vector_float2 spritePosition;
 
-            // Determine the positon of our sprite in the grid
+            // Determine the position of our sprite in the grid
             spritePosition.x = ((-((float)_spritesPerRow) / 2.0) + column) * XSpacing;
             spritePosition.y = ((-((float)_rowsOfSprites) / 2.0) + row) * YSpacing + WaveMagnitude;
 
@@ -248,25 +248,25 @@ static const NSUInteger MaxBuffersInFlight = 3;
     }
 }
 
-// Called whenever the view needs to render
+/// Called whenever the view needs to render
 - (void)drawInMTKView:(nonnull MTKView *)view
 {
-    // Wait to ensure only kMaxBuffersInFlight are getting proccessed by any stage in the Metal
-    //   pipeline (App, Metal, Drivers, GPU, etc)
+    // Wait to ensure only MaxBuffersInFlight number of frames are getting proccessed
+    //   by any stage in the Metal pipeline (App, Metal, Drivers, GPU, etc)
     dispatch_semaphore_wait(_inFlightSemaphore, DISPATCH_TIME_FOREVER);
 
-    // Iterate through our metal buffers, and cycle back to the first when we've written to MaxBuffersInFlight
+    // Iterate through our Metal buffers, and cycle back to the first when we've written to MaxBuffersInFlight
     _currentBuffer = (_currentBuffer + 1) % MaxBuffersInFlight;
 
     // Update data in our buffers
     [self updateState];
 
-    // Create a new command buffer for each renderpass to the current drawable
+    // Create a new command buffer for each render pass to the current drawable
     id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
     commandBuffer.label = @"MyCommand";
 
     // Add completion hander which signals _inFlightSemaphore when Metal and the GPU has fully
-    //   finished proccssing the commands we're encoding this frame.  This indicates when the
+    //   finished processing the commands we're encoding this frame.  This indicates when the
     //   dynamic buffers filled with our vertices, that we're writing to this frame, will no longer
     //   be needed by Metal and the GPU, meaning we can overwrite the buffer contents without
     //   corrupting the rendering.
@@ -275,7 +275,7 @@ static const NSUInteger MaxBuffersInFlight = 3;
     {
         dispatch_semaphore_signal(block_sema);
     }];
-    
+
     MTLRenderPassDescriptor *renderPassDescriptor = view.currentRenderPassDescriptor;
 
     if(renderPassDescriptor != nil)
