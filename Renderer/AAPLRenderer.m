@@ -16,7 +16,6 @@ Implementation of renderer class which performs Metal setup and per frame render
 // The max number of command buffers in flight
 static const NSUInteger MaxBuffersInFlight = 3;
 
-
 // A simple class representing our sprite object, which is just a colored quad on screen
 @interface AAPLSprite : NSObject
 

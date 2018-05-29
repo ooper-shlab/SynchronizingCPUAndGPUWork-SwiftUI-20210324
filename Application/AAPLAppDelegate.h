@@ -10,5 +10,5 @@ Header for our iOS & tvOS application delegate
 @interface AAPLAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
-                        
+
 @end
