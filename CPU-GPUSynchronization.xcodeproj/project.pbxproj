@@ -54,8 +54,8 @@
 		3ABBACED1F73154F0080C72C /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		3ABBACEE1F73154F0080C72C /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS11.0.sdk/System/Library/Frameworks/MetalKit.framework; sourceTree = DEVELOPER_DIR; };
 		3AC448951EC126D7006F9D6B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		3AD49C603AD4F87000000001 /* SampleCode.xcconfig */ = {isa = PBXFileReference; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
-		40124FA0401247C000000001 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; path = LICENSE.txt; sourceTree = "<group>"; };
+		8F476EC08F47708000000001 /* SampleCode.xcconfig */ = {isa = PBXFileReference; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
+		91624170916244F000000001 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; path = LICENSE.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,8 +137,8 @@
 				3A1E2E091F71B49100A7B165 /* Application */,
 				3ABBACE61F7314E80080C72C /* Frameworks */,
 				3A7072DC1EBD4A67001F05E4 /* Products */,
-				3AD49E003AD4A3F000000001 /* Configuration */,
-				401245604012453000000001 /* LICENSE */,
+				8F4772808F47769000000001 /* Configuration */,
+				916253709162534000000001 /* LICENSE */,
 			);
 			sourceTree = "<group>";
 		};
@@ -173,18 +173,18 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		3AD49E003AD4A3F000000001 /* Configuration */ = {
+		8F4772808F47769000000001 /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
-				3AD49C603AD4F87000000001 /* SampleCode.xcconfig */,
+				8F476EC08F47708000000001 /* SampleCode.xcconfig */,
 			);
 			name = Configuration;
 			sourceTree = "<group>";
 		};
-		401245604012453000000001 /* LICENSE */ = {
+		916253709162534000000001 /* LICENSE */ = {
 			isa = PBXGroup;
 			children = (
-				40124FA0401247C000000001 /* LICENSE.txt */,
+				91624170916244F000000001 /* LICENSE.txt */,
 			);
 			name = LICENSE;
 			path = LICENSE;
@@ -391,7 +391,7 @@
 /* Begin XCBuildConfiguration section */
 		3A70732C1EBD4A67001F05E4 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3AD49C603AD4F87000000001 /* SampleCode.xcconfig */;
+			baseConfigurationReference = 8F476EC08F47708000000001 /* SampleCode.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -445,7 +445,7 @@
 		};
 		3A70732D1EBD4A67001F05E4 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3AD49C603AD4F87000000001 /* SampleCode.xcconfig */;
+			baseConfigurationReference = 8F476EC08F47708000000001 /* SampleCode.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -492,7 +492,7 @@
 		};
 		3A70732F1EBD4A67001F05E4 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3AD49C603AD4F87000000001 /* SampleCode.xcconfig */;
+			baseConfigurationReference = 8F476EC08F47708000000001 /* SampleCode.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = "";
@@ -513,7 +513,7 @@
 		};
 		3A7073301EBD4A67001F05E4 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3AD49C603AD4F87000000001 /* SampleCode.xcconfig */;
+			baseConfigurationReference = 8F476EC08F47708000000001 /* SampleCode.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = "";
@@ -532,7 +532,7 @@
 		};
 		3A7073321EBD4A67001F05E4 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3AD49C603AD4F87000000001 /* SampleCode.xcconfig */;
+			baseConfigurationReference = 8F476EC08F47708000000001 /* SampleCode.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = "";
@@ -553,7 +553,7 @@
 		};
 		3A7073331EBD4A67001F05E4 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3AD49C603AD4F87000000001 /* SampleCode.xcconfig */;
+			baseConfigurationReference = 8F476EC08F47708000000001 /* SampleCode.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = "";
@@ -572,7 +572,7 @@
 		};
 		3A7073351EBD4A67001F05E4 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3AD49C603AD4F87000000001 /* SampleCode.xcconfig */;
+			baseConfigurationReference = 8F476EC08F47708000000001 /* SampleCode.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -594,7 +594,7 @@
 		};
 		3A7073361EBD4A67001F05E4 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3AD49C603AD4F87000000001 /* SampleCode.xcconfig */;
+			baseConfigurationReference = 8F476EC08F47708000000001 /* SampleCode.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
