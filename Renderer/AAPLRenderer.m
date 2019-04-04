@@ -2,87 +2,49 @@
 See LICENSE folder for this sample’s licensing information.
 
 Abstract:
-Implementation of renderer class which performs Metal setup and per frame rendering
+Implementation for a renderer class that performs Metal setup and per-frame rendering.
 */
 
 @import MetalKit;
 
 #import "AAPLRenderer.h"
-
-// Header shared between C code here, which executes Metal API commands, and .metal files, which
-//   uses these types as inputs to the shaders
+#import "AAPLTriangle.h"
 #import "AAPLShaderTypes.h"
 
-// The max number of command buffers in flight
-static const NSUInteger MaxBuffersInFlight = 3;
+// The maximum number of frames in flight.
+static const NSUInteger MaxFramesInFlight = 3;
 
-// A simple class representing our sprite object, which is just a colored quad on screen
-@interface AAPLSprite : NSObject
+// The number of triangles in the scene, determined to fit the screen.
+static const NSUInteger NumTriangles = 50;
 
-@property (nonatomic) vector_float2 position;
-
-@property (nonatomic) vector_float4 color;
-
-+(const AAPLVertex*)vertices;
-
-+(NSUInteger)vertexCount;
-
-@end
-
-@implementation AAPLSprite
-
-// Return the vertices of one quad posistion at the origin.  After updating the
-//   sprite's position each frame, we copy it to our vertex buffer
-+(const AAPLVertex *)vertices
-{
-    const float SpriteSize = 5;
-    static const AAPLVertex spriteVertices[] =
-    {
-        //Pixel Positions,                 RGBA colors
-        { { -SpriteSize,   SpriteSize },   { 0, 0, 0, 1 } },
-        { {  SpriteSize,   SpriteSize },   { 0, 0, 0, 1 } },
-        { { -SpriteSize,  -SpriteSize },   { 0, 0, 0, 1 } },
-
-        { {  SpriteSize,  -SpriteSize },   { 0, 0, 0, 1 } },
-        { { -SpriteSize,  -SpriteSize },   { 0, 0, 0, 1 } },
-        { {  SpriteSize,   SpriteSize },   { 0, 0, 1, 1 } },
-    };
-
-    return spriteVertices;
-}
-
-// The number of vertices for each sprite
-+(NSUInteger) vertexCount
-{
-    return 6;
-}
-
-@end
-
-// Main class performing the rendering
+// The main class performing the rendering.
 @implementation AAPLRenderer
 {
+    // A semaphore used to ensure that buffers read by the GPU are not simultaneously written by the CPU.
     dispatch_semaphore_t _inFlightSemaphore;
+
+    // A series of buffers containing dynamically-updated vertices.
+    id<MTLBuffer> _vertexBuffers[MaxFramesInFlight];
+
+    // The index of the Metal buffer in _vertexBuffers to write to for the current frame.
+    NSUInteger _currentBuffer;
+
     id<MTLDevice> _device;
+
     id<MTLCommandQueue> _commandQueue;
 
     id<MTLRenderPipelineState> _pipelineState;
-    id<MTLBuffer>              _vertexBuffers[MaxBuffersInFlight];
 
-    // The current size of our view so we can use this in our render pipeline
     vector_uint2 _viewportSize;
 
-    NSUInteger _currentBuffer;
+    NSArray<AAPLTriangle*> *_triangles;
 
-    NSArray<AAPLSprite*> *_sprites;
+    NSUInteger _totalVertexCount;
 
-    NSUInteger _spritesPerRow;
-    NSUInteger _rowsOfSprites;
-    NSUInteger _totalSpriteVertexCount;
-
+    float _wavePosition;
 }
 
-/// Initialize with the MetalKit view from which we'll obtain our Metal device
+/// Initializes the renderer with the MetalKit view from which you obtain the Metal device.
 - (nonnull instancetype)initWithMetalKitView:(nonnull MTKView *)mtkView
 {
     self = [super init];
@@ -90,27 +52,25 @@ static const NSUInteger MaxBuffersInFlight = 3;
     {
         _device = mtkView.device;
 
-        _inFlightSemaphore = dispatch_semaphore_create(MaxBuffersInFlight);
-        // Create and load our basic Metal state objects
+        _inFlightSemaphore = dispatch_semaphore_create(MaxFramesInFlight);
 
-        // Load all the shader files with a metal file extension in the project
+        // Load all the shader files with a metal file extension in the project.
         id<MTLLibrary> defaultLibrary = [_device newDefaultLibrary];
 
-        // Load the vertex function into the library
+        // Load the vertex shader.
         id<MTLFunction> vertexFunction = [defaultLibrary newFunctionWithName:@"vertexShader"];
 
-        // Load the fragment function into the library
+        // Load the fragment shader.
         id<MTLFunction> fragmentFunction = [defaultLibrary newFunctionWithName:@"fragmentShader"];
 
-        // Create a reusable pipeline state
+        // Create a reusable pipeline state object.
         MTLRenderPipelineDescriptor *pipelineStateDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
         pipelineStateDescriptor.label = @"MyPipeline";
         pipelineStateDescriptor.sampleCount = mtkView.sampleCount;
         pipelineStateDescriptor.vertexFunction = vertexFunction;
         pipelineStateDescriptor.fragmentFunction = fragmentFunction;
         pipelineStateDescriptor.colorAttachments[0].pixelFormat = mtkView.colorPixelFormat;
-        pipelineStateDescriptor.depthAttachmentPixelFormat = mtkView.depthStencilPixelFormat;
-        pipelineStateDescriptor.stencilAttachmentPixelFormat = mtkView.depthStencilPixelFormat;
+        pipelineStateDescriptor.vertexBuffers[AAPLVertexInputIndexVertices].mutability = MTLMutabilityImmutable;
 
         NSError *error = NULL;
         _pipelineState = [_device newRenderPipelineStateWithDescriptor:pipelineStateDescriptor error:&error];
@@ -118,197 +78,179 @@ static const NSUInteger MaxBuffersInFlight = 3;
         {
             NSLog(@"Failed to created pipeline state, error %@", error);
         }
-        // Create the command queue
+        // Create the command queue.
         _commandQueue = [_device newCommandQueue];
 
-        [self generateSprites];
+        // Generate the triangles rendered by the app.
+        [self generateTriangles];
 
-        _totalSpriteVertexCount = AAPLSprite.vertexCount * _sprites.count;
+        // Calculate vertex data and allocate vertex buffers.
+        const NSUInteger triangleVertexCount = [AAPLTriangle vertexCount];
+        _totalVertexCount = triangleVertexCount * _triangles.count;
+        const NSUInteger triangleVertexBufferSize = _totalVertexCount * sizeof(AAPLVertex);
 
-        NSUInteger spriteVertexBufferSize = _totalSpriteVertexCount * sizeof(AAPLVertex);
-
-        for(NSUInteger bufferIndex = 0; bufferIndex < MaxBuffersInFlight; bufferIndex++)
+        for(NSUInteger bufferIndex = 0; bufferIndex < MaxFramesInFlight; bufferIndex++)
         {
-            _vertexBuffers[bufferIndex] = [_device newBufferWithLength:spriteVertexBufferSize
+            _vertexBuffers[bufferIndex] = [_device newBufferWithLength:triangleVertexBufferSize
                                                                options:MTLResourceStorageModeShared];
+            _vertexBuffers[bufferIndex].label = [NSString stringWithFormat:@"Vertex Buffer #%lu", (unsigned long)bufferIndex];
         }
-
     }
-
     return self;
 }
 
-/// Generate a list of sprites, initializing each and inserting it into `_sprites`.
-- (void) generateSprites
+/// Generates an array of triangles, initializing each and inserting it into `_triangles`.
+- (void)generateTriangles
 {
-    const float XSpacing = 12;
-    const float YSpacing = 16;
-
-    const NSUInteger SpritesPerRow = 110;
-    const NSUInteger RowsOfSprites = 50;
-    const float WaveMagnitude = 30.0;
-
+    // Array of colors.
     const vector_float4 Colors[] =
     {
         { 1.0, 0.0, 0.0, 1.0 },  // Red
-        { 0.0, 1.0, 1.0, 1.0 },  // Cyan
         { 0.0, 1.0, 0.0, 1.0 },  // Green
-        { 1.0, 0.5, 0.0, 1.0 },  // Orange
-        { 1.0, 0.0, 1.0, 1.0 },  // Magenta
         { 0.0, 0.0, 1.0, 1.0 },  // Blue
+        { 1.0, 0.0, 1.0, 1.0 },  // Magenta
+        { 0.0, 1.0, 1.0, 1.0 },  // Cyan
         { 1.0, 1.0, 0.0, 1.0 },  // Yellow
-        { .75, 0.5, .25, 1.0 },  // Brown
-        { 1.0, 1.0, 1.0, 1.0 },  // White
-
     };
 
     const NSUInteger NumColors = sizeof(Colors) / sizeof(vector_float4);
 
-    _spritesPerRow = SpritesPerRow;
-    _rowsOfSprites = RowsOfSprites;
+    // Horizontal spacing between each triangle.
+    const float horizontalSpacing = 16;
 
-    NSMutableArray *sprites = [[NSMutableArray alloc] initWithCapacity:_rowsOfSprites * _spritesPerRow];
-
-    // Create a grid of 'sprite' objects
-    for(NSUInteger row = 0; row < _rowsOfSprites; row++)
+    NSMutableArray *triangles = [[NSMutableArray alloc] initWithCapacity:NumTriangles];
+    
+    // Initialize each triangle.
+    for(NSUInteger t = 0; t < NumTriangles; t++)
     {
-        for(NSUInteger column = 0; column < _spritesPerRow; column++)
-        {
-            vector_float2 spritePosition;
+        vector_float2 trianglePosition;
 
-            // Determine the position of our sprite in the grid
-            spritePosition.x = ((-((float)_spritesPerRow) / 2.0) + column) * XSpacing;
-            spritePosition.y = ((-((float)_rowsOfSprites) / 2.0) + row) * YSpacing + WaveMagnitude;
+        // Determine the starting position of the triangle in a horizontal line.
+        trianglePosition.x = ((-((float)NumTriangles) / 2.0) + t) * horizontalSpacing;
+        trianglePosition.y = 0.0;
 
-            // Displace the height of this sprite using a sin wave
-            spritePosition.y += (sin(spritePosition.x/WaveMagnitude) * WaveMagnitude);
-
-            // Create our sprite, set its properties and add it to our list
-            AAPLSprite * sprite = [AAPLSprite new];
-
-            sprite.position = spritePosition;
-            sprite.color = Colors[row%NumColors];
-
-            [sprites addObject:sprite];
-        }
+        // Create the triangle, set its properties, and add it to the array.
+        AAPLTriangle * triangle = [AAPLTriangle new];
+        triangle.position = trianglePosition;
+        triangle.color = Colors[t % NumColors];
+        [triangles addObject:triangle];
     }
-    _sprites = sprites;
+    _triangles = triangles;
 }
 
-/// Called whenever view changes orientation or is resized
+/// Updates the position of each triangle and also updates the vertices for each triangle in the current buffer.
+- (void)updateState
+{
+    // Simplified wave properties.
+    const float waveMagnitude = 128.0;  // Vertical displacement.
+    const float waveSpeed     = 0.05;   // Displacement change from the previous frame.
+
+    // Increment wave position from the previous frame
+    _wavePosition += waveSpeed;
+
+    // Vertex data for a single default triangle.
+    const AAPLVertex *triangleVertices = [AAPLTriangle vertices];
+    const NSUInteger triangleVertexCount = [AAPLTriangle vertexCount];
+
+    // Vertex data for the current triangles.
+    AAPLVertex *currentTriangleVertices = _vertexBuffers[_currentBuffer].contents;
+
+    // Update each triangle.
+    for(NSUInteger triangle = 0; triangle < NumTriangles; triangle++)
+    {
+        vector_float2 trianglePosition = _triangles[triangle].position;
+
+        // Displace the y-position of the triangle using a sine wave.
+        trianglePosition.y = (sin(trianglePosition.x/waveMagnitude + _wavePosition) * waveMagnitude);
+
+        // Update the position of the triangle.
+        _triangles[triangle].position = trianglePosition;
+
+        // Update the vertices of the current vertex buffer with the triangle's new position.
+        for(NSUInteger vertex = 0; vertex < triangleVertexCount; vertex++)
+        {
+            NSUInteger currentVertex = vertex + (triangle * triangleVertexCount);
+            currentTriangleVertices[currentVertex].position = triangleVertices[vertex].position + _triangles[triangle].position;
+            currentTriangleVertices[currentVertex].color = _triangles[triangle].color;
+        }
+    }
+}
+
+#pragma mark - MetalKit View Delegate
+
+/// Handles view orientation or size changes.
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size
 {
-    // Save the size of the drawable as we'll pass these
-    //   values to our vertex shader when we draw
+    // Regenerate the triangles.
+    [self generateTriangles];
+
+    // Save the size of the drawable as you'll pass these
+    // values to the vertex shader when you render.
     _viewportSize.x = size.width;
     _viewportSize.y = size.height;
 }
 
-/// Update the position of each sprite and also update vertices for each sprite in our buffer
-- (void)updateState
-{
-
-    // Change the position of the sprites by getting taking on the height of the sprite
-    //  immediately to the right of the current sprite.
-
-    AAPLVertex *currentSpriteVertices = _vertexBuffers[_currentBuffer].contents;
-    NSUInteger  currentVertex = _totalSpriteVertexCount-1;
-    NSUInteger  spriteIdx = (_rowsOfSprites * _spritesPerRow)-1;
-
-    for(NSInteger row = _rowsOfSprites - 1; row >= 0; row--)
-    {
-        float startY = _sprites[spriteIdx].position.y;
-        for(NSInteger spriteInRow = _spritesPerRow-1; spriteInRow >= 0; spriteInRow--)
-        {
-            // Update the position of our sprite
-            vector_float2 updatedPosition = _sprites[spriteIdx].position;
-
-            if(spriteInRow == 0)
-            {
-                updatedPosition.y = startY;
-            }
-            else
-            {
-                updatedPosition.y = _sprites[spriteIdx-1].position.y;
-            }
-
-            _sprites[spriteIdx].position = updatedPosition;
-
-            // Update vertices of the current vertex buffer with the sprites new position
-
-            for(NSInteger vertexOfSprite = AAPLSprite.vertexCount-1; vertexOfSprite >= 0 ; vertexOfSprite--)
-            {
-                currentSpriteVertices[currentVertex].position = AAPLSprite.vertices[vertexOfSprite].position + _sprites[spriteIdx].position;
-                currentSpriteVertices[currentVertex].color = _sprites[spriteIdx].color;
-                currentVertex--;
-            }
-            spriteIdx--;
-        }
-    }
-}
-
-/// Called whenever the view needs to render
+/// Handles view rendering for a new frame.
 - (void)drawInMTKView:(nonnull MTKView *)view
 {
-    // Wait to ensure only MaxBuffersInFlight number of frames are getting proccessed
-    //   by any stage in the Metal pipeline (App, Metal, Drivers, GPU, etc)
+    // Wait to ensure only `MaxFramesInFlight` number of frames are getting processed
+    // by any stage in the Metal pipeline (CPU, GPU, Metal, Drivers, etc.).
     dispatch_semaphore_wait(_inFlightSemaphore, DISPATCH_TIME_FOREVER);
 
-    // Iterate through our Metal buffers, and cycle back to the first when we've written to MaxBuffersInFlight
-    _currentBuffer = (_currentBuffer + 1) % MaxBuffersInFlight;
+    // Iterate through the Metal buffers, and cycle back to the first when you've written to the last.
+    _currentBuffer = (_currentBuffer + 1) % MaxFramesInFlight;
 
-    // Update data in our buffers
+    // Update buffer data.
     [self updateState];
 
-    // Create a new command buffer for each render pass to the current drawable
+    // Create a new command buffer for each rendering pass to the current drawable.
     id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
-    commandBuffer.label = @"MyCommand";
-
-    // Add completion hander which signals _inFlightSemaphore when Metal and the GPU has fully
-    //   finished processing the commands we're encoding this frame.  This indicates when the
-    //   dynamic buffers filled with our vertices, that we're writing to this frame, will no longer
-    //   be needed by Metal and the GPU, meaning we can overwrite the buffer contents without
-    //   corrupting the rendering.
-    __block dispatch_semaphore_t block_sema = _inFlightSemaphore;
-    [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer)
-    {
-        dispatch_semaphore_signal(block_sema);
-    }];
+    commandBuffer.label = @"MyCommandBuffer";
 
     MTLRenderPassDescriptor *renderPassDescriptor = view.currentRenderPassDescriptor;
-
     if(renderPassDescriptor != nil)
     {
-        // Create a render command encoder so we can render into something
-        id<MTLRenderCommandEncoder> renderEncoder =
-        [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
+        // Create a render command encoder to encode the rendering pass.
+        id<MTLRenderCommandEncoder> renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
         renderEncoder.label = @"MyRenderEncoder";
 
-        // Set render command encoder state
-        [renderEncoder setCullMode:MTLCullModeBack];
+        // Set render command encoder state.
         [renderEncoder setRenderPipelineState:_pipelineState];
 
+        // Set the current vertex buffer.
         [renderEncoder setVertexBuffer:_vertexBuffers[_currentBuffer]
-                               offset:0
-                              atIndex:AAPLVertexInputIndexVertices];
+                                offset:0
+                               atIndex:AAPLVertexInputIndexVertices];
 
+        // Set the viewport size.
         [renderEncoder setVertexBytes:&_viewportSize
                                length:sizeof(_viewportSize)
                               atIndex:AAPLVertexInputIndexViewportSize];
 
-        // Draw the vertices of our quads
+        // Draw the triangle vertices.
         [renderEncoder drawPrimitives:MTLPrimitiveTypeTriangle
                           vertexStart:0
-                          vertexCount:_totalSpriteVertexCount];
+                          vertexCount:_totalVertexCount];
 
-        // We're done encoding commands
+        // Finalize encoding.
         [renderEncoder endEncoding];
 
-        // Schedule a present once the framebuffer is complete using the current drawable
+        // Schedule a drawable's presentation after the rendering pass is complete.
         [commandBuffer presentDrawable:view.currentDrawable];
     }
 
-    // Finalize rendering here & push the command buffer to the GPU
+    // Add a completion handler that signals `_inFlightSemaphore` when Metal and the GPU have fully
+    // finished processing the commands that were encoded for this frame.
+    // This completion indicates that the dynamic buffers that were written-to in this frame, are no
+    // longer needed by Metal and the GPU; therefore, the CPU can overwrite the buffer contents
+    // without corrupting any rendering operations.
+    __block dispatch_semaphore_t block_semaphore = _inFlightSemaphore;
+    [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer)
+     {
+         dispatch_semaphore_signal(block_semaphore);
+     }];
+
+    // Finalize CPU work and submit the command buffer to the GPU.
     [commandBuffer commit];
 }
 

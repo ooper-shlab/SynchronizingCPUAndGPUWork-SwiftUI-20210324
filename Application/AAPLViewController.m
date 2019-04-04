@@ -2,7 +2,7 @@
 See LICENSE folder for this sample’s licensing information.
 
 Abstract:
-Implementation of our cross-platform view controller
+Implementation of the cross-platform view controller.
 */
 
 #import "AAPLViewController.h"
@@ -19,7 +19,7 @@ Implementation of our cross-platform view controller
 {
     [super viewDidLoad];
 
-    // Set the view to use the default device
+    // Set the view to use the default device.
     _view = (MTKView *)self.view;
     _view.device = MTLCreateSystemDefaultDevice();
 
@@ -37,7 +37,7 @@ Implementation of our cross-platform view controller
         return;
     }
 
-    // Initialize our renderer with the view size
+    // Initialize the renderer with the view size.
     [_renderer mtkView:_view drawableSizeWillChange:_view.drawableSize];
 
     _view.delegate = _renderer;
