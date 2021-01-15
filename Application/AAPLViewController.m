@@ -21,23 +21,15 @@ Implementation of the cross-platform view controller.
 
     // Set the view to use the default device.
     _view = (MTKView *)self.view;
+    
     _view.device = MTLCreateSystemDefaultDevice();
-
-    if(!_view.device)
-    {
-        NSLog(@"Metal is not supported on this device");
-        return;
-    }
-
+    
+    NSAssert(_view.device, @"Metal is not supported on this device");
+    
     _renderer = [[AAPLRenderer alloc] initWithMetalKitView:_view];
-
-    if(!_renderer)
-    {
-        NSLog(@"Renderer failed initialization");
-        return;
-    }
-
-    // Initialize the renderer with the view size.
+    
+    NSAssert(_renderer, @"Renderer failed initialization");
+    
     [_renderer mtkView:_view drawableSizeWillChange:_view.drawableSize];
 
     _view.delegate = _renderer;

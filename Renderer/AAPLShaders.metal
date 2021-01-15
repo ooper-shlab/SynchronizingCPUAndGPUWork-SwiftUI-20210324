@@ -6,15 +6,14 @@ Metal vertex and fragment shaders.
 */
 
 #include <metal_stdlib>
-#include <simd/simd.h>
 
 using namespace metal;
 
 // Include header shared between this Metal shader code and the C code executing Metal API commands.
-#import "AAPLShaderTypes.h"
+#include "AAPLShaderTypes.h"
 
 // Vertex shader outputs and fragment shader inputs.
-typedef struct
+struct RasterizerData
 {
     // The [[position]] attribute qualifier of this member indicates this value is the clip space
     // position of the vertex when this structure is returned from the vertex shader.
@@ -25,7 +24,7 @@ typedef struct
     // value to the fragment shader for each fragment in that triangle.
     float4 color;
 
-} RasterizerData;
+};
 
 // Vertex shader.
 vertex RasterizerData

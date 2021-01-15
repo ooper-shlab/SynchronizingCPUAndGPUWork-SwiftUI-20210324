@@ -72,12 +72,12 @@ static const NSUInteger NumTriangles = 50;
         pipelineStateDescriptor.colorAttachments[0].pixelFormat = mtkView.colorPixelFormat;
         pipelineStateDescriptor.vertexBuffers[AAPLVertexInputIndexVertices].mutability = MTLMutabilityImmutable;
 
-        NSError *error = NULL;
+        NSError *error;
+
         _pipelineState = [_device newRenderPipelineStateWithDescriptor:pipelineStateDescriptor error:&error];
-        if (!_pipelineState)
-        {
-            NSLog(@"Failed to created pipeline state, error %@", error);
-        }
+        
+        NSAssert(_pipelineState, @"Failed to create pipeline state: %@", error);
+        
         // Create the command queue.
         _commandQueue = [_device newCommandQueue];
 

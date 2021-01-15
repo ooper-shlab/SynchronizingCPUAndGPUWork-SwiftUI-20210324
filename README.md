@@ -12,7 +12,7 @@ The project continuously renders triangles along a sine wave. In each frame, the
 
 The sample stores the triangle vertices in a buffer that's shared between the CPU and the GPU. The CPU writes data to the buffer and the GPU reads it.
 
-- Note: The Xcode project contains schemes for running the sample on macOS, iOS, and tvOS. Metal is not supported in the iOS or tvOS Simulator; to run the sample, you need an iOS device for the iOS scheme and an Apple TV for the tvOS scheme. The default scheme is macOS, which runs the sample on your Mac.
+- Note: The Xcode project contains schemes for running the sample on macOS, iOS, and tvOS. The default scheme is macOS, which runs the sample on your Mac.
 
 ## Understand the Solution to Data Dependencies and Processor Stalls
 
